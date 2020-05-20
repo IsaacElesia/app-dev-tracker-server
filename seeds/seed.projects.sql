@@ -1,0 +1,10 @@
+INSERT INTO projects (start_date, due_date, project_name, project_repo, completed, created_by, description)
+VALUES
+(now() - '12 days' :: INTERVAL, now() + '19 days'::INTERVAL, 'noteful', 'https://github.com/IsaacElesia/noteful-server',false, 11, '"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment'),
+(now() - '1 days' :: INTERVAL, now() + '39 days'::INTERVAL, 'shoping-list', 'https://github.com/IsaacElesia/noteful-server',false, 1, null),
+(now() - '22 days' :: INTERVAL, now() - '1 days'::INTERVAL, 'teroll', 'https://github.com/IsaacElesia/noteful-server',true, 2, 'dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain'),
+(now() - '12 days' :: INTERVAL, now() + '19 days'::INTERVAL, 'streamer', 'https://github.com/IsaacElesia/noteful-server',false, 11, null),
+(now() - '18 days' :: INTERVAL, now() - '3 days'::INTERVAL, 'spicey', 'https://github.com/IsaacElesia/noteful-server',true, 5, '. Et harum quidem rerum facilis est et expedita distinction.'),
+(now() - '42 days' :: INTERVAL, now() - '9 days'::INTERVAL, 'blogful', 'https://github.com/IsaacElesia/noteful-server',true, 11, null),
+(now() - '12 days' :: INTERVAL, now() + '19 days'::INTERVAL, 'ecom', 'https://github.com/IsaacElesia/noteful-server',false, 2, '. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit qu'),
+(now() - '12 days' :: INTERVAL, now() + '39 days'::INTERVAL, 'kingsly', 'https://github.com/IsaacElesia/noteful-server',false, 10, '"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled')
