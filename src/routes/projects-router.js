@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const xss = require('xss');
-const ProjectsService = require('./projects-service');
+const AppService = require('../AppService');
 const auth = require('../middleware/auth');
 
 const projectsRouter = express.Router();
@@ -25,13 +25,13 @@ projectsRouter
 	//@access  private
 	.get(auth, (req, res, next) => {
 		const knexInstance = req.app.get('db');
-		ProjectsService.getAllProjects(knexInstance)
+		AppService.getAllItems(knexInstance, 'projects')
 			.then((projects) => {
 				res.json(projects.map(serializeProject));
 			})
 			.catch(next);
 	})
-	//@route   POST api/users
+	//@route   POST api/projects
 	//@desc    Create new project
 	//@access  private
 	.post(auth, jsonParser, (req, res, next) => {
@@ -64,7 +64,7 @@ projectsRouter
 		newProject.completed = completed;
 		newProject.description = description;
 
-		ProjectsService.insertProject(req.app.get('db'), newProject)
+		AppService.insertItem(req.app.get('db'), 'projects', newProject)
 			.then((project) => {
 				res
 					.status(201)
@@ -77,7 +77,7 @@ projectsRouter
 projectsRouter
 	.route('/:project_id')
 	.all((req, res, next) => {
-		ProjectsService.getById(req.app.get('db'), req.params.project_id)
+		AppService.getById(req.app.get('db'), 'projects', req.params.project_id)
 			.then((project) => {
 				if (!project) {
 					return res.status(404).json({
@@ -99,7 +99,7 @@ projectsRouter
 	//@desc    DELETE project
 	//@access  private
 	.delete(auth, (req, res, next) => {
-		ProjectsService.deleteProject(req.app.get('db'), req.params.project_id)
+		AppService.deleteItem(req.app.get('db'), 'projects', req.params.project_id)
 			.then((numRowsAffected) => {
 				res.status(204).end();
 			})
@@ -139,8 +139,9 @@ projectsRouter
 				},
 			});
 
-		ProjectsService.updateProect(
+		AppService.updateItem(
 			req.app.get('db'),
+			'projects',
 			req.params.project_id,
 			projectToUpdate
 		)

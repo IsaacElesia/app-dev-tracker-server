@@ -4,7 +4,7 @@ const xss = require('xss');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRETE } = require('../config');
-const UsersService = require('./users-service');
+const AppService = require('../AppService');
 const auth = require('../middleware/auth');
 
 const usersRouter = express.Router();
@@ -25,7 +25,7 @@ usersRouter
 	//@access  private
 	.get(auth, (req, res, next) => {
 		const knexInstance = req.app.get('db');
-		UsersService.getAllUsers(knexInstance)
+		AppService.getAllItems(knexInstance, 'users')
 			.then((users) => {
 				res.json(users.map(serializeUser));
 			})
@@ -50,7 +50,7 @@ usersRouter
 		newUser.avatar_url = avatarUrl;
 
 		//See if user exist
-		UsersService.getByEmail(req.app.get('db'), newUser.email)
+		AppService.getByEmail(req.app.get('db'), 'users', newUser.email)
 			.then((user) => {
 				if (user) {
 					return res
@@ -63,27 +63,29 @@ usersRouter
 					bcrypt.hash(password, salt).then((saltPassword) => {
 						newUser.password = saltPassword;
 
-						UsersService.insertUser(req.app.get('db'), newUser).then((user) => {
-							//return JsonWebToken
-							const payload = {
-								user: {
-									id: user.id,
-								},
-							};
+						AppService.insertItem(req.app.get('db'), 'users', newUser).then(
+							(user) => {
+								//return JsonWebToken
+								const payload = {
+									user: {
+										id: user.id,
+									},
+								};
 
-							jwt.sign(
-								payload,
-								JWT_SECRETE,
-								{ expiresIn: 360000 },
-								(err, token) => {
-									if (err) throw err;
-									res
-										.status(201)
-										.location(path.posix.join(req.originalUrl, `/${user.id}`))
-										.json({ token });
-								}
-							);
-						});
+								jwt.sign(
+									payload,
+									JWT_SECRETE,
+									{ expiresIn: 360000 },
+									(err, token) => {
+										if (err) throw err;
+										res
+											.status(201)
+											.location(path.posix.join(req.originalUrl, `/${user.id}`))
+											.json({ token });
+									}
+								);
+							}
+						);
 					});
 				});
 			})
@@ -93,7 +95,7 @@ usersRouter
 usersRouter
 	.route('/:user_id')
 	.all((req, res, next) => {
-		UsersService.getById(req.app.get('db'), req.params.user_id)
+		AppService.getById(req.app.get('db'), 'users', req.params.user_id)
 			.then((user) => {
 				if (!user) {
 					return res.status(404).json({
@@ -115,7 +117,7 @@ usersRouter
 	//@desc    DELETE user
 	//@access  private
 	.delete(auth, (req, res, next) => {
-		UsersService.deleteUser(req.app.get('db'), req.params.user_id)
+		AppService.deleteItem(req.app.get('db'), 'users', req.params.user_id)
 			.then((numRowsAffected) => {
 				res.status(204).end();
 			})
@@ -143,7 +145,12 @@ usersRouter
 				},
 			});
 
-		UsersService.updateUser(req.app.get('db'), req.params.user_id, userToUpdate)
+		AppService.updateItem(
+			req.app.get('db'),
+			'users',
+			req.params.user_id,
+			userToUpdate
+		)
 			.then((numRowsAffected) => {
 				res.status(204).end();
 			})

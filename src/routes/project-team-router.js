@@ -1,57 +1,42 @@
 const path = require('path');
 const express = require('express');
-const xss = require('xss');
-const ProjectsService = require('./projects-service');
+const AppService = require('../AppService');
 const auth = require('../middleware/auth');
 
-const projectsRouter = express.Router();
+const projectTeamRouter = express.Router();
 const jsonParser = express.json();
 
-const serializeProject = (project) => ({
-	projectId: project.id,
-	startDate: xss(project.start_date),
-	dueDate: xss(project.due_date),
-	projectName: xss(project.project_name),
-	projectRepo: xss(project.project_repo),
-	completed: xss(project.completed),
-	createdBy: xss(project.created_by),
-	description: xss(project.description),
+const serializeProjectTeamMember = (projectTeam) => ({
+	projectTeamId: projectTeam.id,
+	projectId: projectTeam.project_id,
+	userId: projectTeam.user_id,
 });
 
-projectsRouter
+projectTeamRouter
 	.route('/')
-	//@route   GET api/projects
-	//@desc    Get all projects
+	//@route   GET api/project/team
+	//@desc    Get all projects team members
 	//@access  private
 	.get(auth, (req, res, next) => {
 		const knexInstance = req.app.get('db');
-		ProjectsService.getAllProjects(knexInstance)
-			.then((projects) => {
-				res.json(projects.map(serializeProject));
+		AppService.getAllItems(knexInstance, 'project_team')
+			.then((proTeam) => {
+				res.json(proTeam.map(serializeProjectTeamMember));
 			})
 			.catch(next);
 	})
-	//@route   POST api/users
-	//@desc    Create new project
+	//@route   POST api/project/team
+	//@desc    Add a new project team member
 	//@access  private
 	.post(auth, jsonParser, (req, res, next) => {
-		const {
-			startDate,
-			dueDate,
-			projectName,
-			projectRepo,
-			completed,
-			createdBy,
-			description,
-		} = req.body;
+		const { projectId, userId } = req.body;
 
-		const newProject = {
-			due_date: dueDate,
-			project_name: projectName,
-			created_by: createdBy,
+		const newProjectTeamMember = {
+			project_id: projectId,
+			user_id: userId,
 		};
 
-		for (const [key, value] of Object.entries(newProject)) {
+		for (const [key, value] of Object.entries(newProjectTeamMember)) {
 			if (value == null) {
 				return res.status(400).json({
 					error: { message: `Missing '${key}' in request body` },
@@ -59,90 +44,84 @@ projectsRouter
 			}
 		}
 
-		newProject.start_date = startDate;
-		newProject.project_repo = projectRepo;
-		newProject.completed = completed;
-		newProject.description = description;
-
-		ProjectsService.insertProjec(req.app.get('db'), newProject)
-			.then((project) => {
+		AppService.insertItem(
+			req.app.get('db'),
+			'project_team',
+			newProjectTeamMember
+		)
+			.then((projectTeamMember) => {
 				res
 					.status(201)
-					.location(path.posix.join(req.originalUrl, `/${project.id}`))
-					.json(serializeProject(project));
+					.location(
+						path.posix.join(req.originalUrl, `/${projectTeamMember.id}`)
+					)
+					.json(serializeProjectTeamMember(projectTeamMember));
 			})
 			.catch(next);
 	});
 
-projectsRouter
-	.route('/:project_id')
+projectTeamRouter
+	.route('/:proteam_id')
 	.all((req, res, next) => {
-		ProjectsService.getById(req.app.get('db'), req.params.project_id)
-			.then((project) => {
-				if (!project) {
+		AppService.getById(req.app.get('db'), 'project_team', req.params.proteam_id)
+			.then((proTeam) => {
+				if (!proTeam) {
 					return res.status(404).json({
-						error: { message: "Project doesn't exist" },
+						error: { message: "Project team doesn't exist" },
 					});
 				}
-				res.project = project;
+				res.proteam = proTeam;
 				next();
 			})
 			.catch(next);
 	})
-	//@route   GET api/projects/project_id
-	//@desc    Get project Info
+	//@route   GET api/project/team/proteam_id
+	//@desc    Get project member
 	//@access  private
 	.get(auth, (req, res, next) => {
-		res.json(serializeProject(res.project));
+		res.json(serializeProjectTeamMember(res.proteam));
 	})
-	//@route   DELETE api/projects/project_id
-	//@desc    DELETE project
+	//@route   DELETE api/project/team/proteam_id
+	//@desc    DELETE project team member
 	//@access  private
 	.delete(auth, (req, res, next) => {
-		ProjectsService.deleteProject(req.app.get('db'), req.params.project_id)
+		AppService.deleteItem(
+			req.app.get('db'),
+			'project_team',
+			req.params.proteam_id
+		)
 			.then((numRowsAffected) => {
 				res.status(204).end();
 			})
 			.catch(next);
 	})
-	//@route   PATCH api/projects/project_id
-	//@desc    Update project Info
+	//@route   PATCH api/project/team/proteam_id
+	//@desc    Update project team member Info
 	//@access  private
 	.patch(auth, jsonParser, (req, res, next) => {
-		const {
-			startDate,
-			dueDate,
-			projectName,
-			projectRepo,
-			completed,
-			createdBy,
-			description,
-		} = req.body;
+		const { projectId, userId } = req.body;
 
-		const projectToUpdate = {
-			start_date: startDate,
-			due_date: dueDate,
-			project_name: projectName,
-			project_repo: projectRepo,
-			created_by: createdBy,
-			completed,
-			description,
+		const projectTeamMemberToUpdate = {
+			project_id: projectId,
+			user_id: userId,
 		};
 
-		const numberOfValues = Object.values(projectToUpdate).filter(Boolean)
-			.length;
+		const numberOfValues = Object.values(projectTeamMemberToUpdate).filter(
+			Boolean
+		).length;
 		if (numberOfValues === 0)
 			return res.status(400).json({
 				error: {
 					message:
-						"Request body must contain either 'start-date', 'due-date', 'project name', 'project repo', or 'project description'",
+						"Request body must contain either  'project id', or 'user id'",
 				},
 			});
 
-		ProjectsService.updateProect(
+		AppService.updateItem(
 			req.app.get('db'),
-			req.params.project_id,
-			projectToUpdate
+			'project_team',
+			req.params.proteam_id,
+			projectTeamMemberToUpdate
 		)
 			.then((numRowsAffected) => {
 				res.status(204).end();
@@ -150,4 +129,4 @@ projectsRouter
 			.catch(next);
 	});
 
-module.exports = projectsRouter;
+module.exports = projectTeamRouter;

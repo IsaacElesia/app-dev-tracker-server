@@ -16,9 +16,13 @@ app.use(helmet());
 app.use(cors());
 
 //Routes
-app.use('/api/auth', require('./auth/auth-router'));
-app.use('/api/users', require('./users/users-router'));
-app.use('/api/projects', require('./projects/projects-router'));
+app.use('/api/auth', require('./routes/auth-router'));
+app.use('/api/users', require('./routes/users-router'));
+app.use('/api/projects', require('./routes/projects-router'));
+app.use('/api/project/team', require('./routes/project-team-router'));
+app.use('/api/sections', require('./routes/sections-router'));
+app.use('/api/section/team', require('./routes/section-team-router'));
+app.use('/api/tasks', require('./routes/task-router'));
 
 //Error Handler Middleware
 app.use(errorHandler);

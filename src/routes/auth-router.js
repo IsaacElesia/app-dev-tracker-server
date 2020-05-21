@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRETE } = require('../config');
-const UsersService = require('../users/users-service');
+const AppService = require('../AppService');
 const jsonParser = express.json();
 
 const auth = require('../middleware/auth');
@@ -13,7 +13,11 @@ const auth = require('../middleware/auth');
 //@access  private
 router.get('/', auth, async (req, res, next) => {
 	try {
-		const user = await UsersService.getById(req.app.get('db'), req.user.id);
+		const user = await AppService.getById(
+			req.app.get('db'),
+			'users',
+			req.user.id
+		);
 		res.json(user);
 	} catch (err) {
 		console.error(err.message);
@@ -38,7 +42,7 @@ router.post('/', jsonParser, async (req, res) => {
 	}
 
 	try {
-		let user = await UsersService.getByEmail(req.app.get('db'), email);
+		let user = await AppService.getByEmail(req.app.get('db'), 'users', email);
 
 		if (!user) {
 			return res
