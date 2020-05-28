@@ -28,6 +28,37 @@ const AppService = {
 	updateItem(knex, table, id, newItemFields) {
 		return knex(table).where({ id }).update(newItemFields);
 	},
+
+	projectsUserInvolveIn(knex, userId) {
+		return knex('project_team')
+			.join('projects', 'project_team.project_id', '=', 'projects.id')
+			.select('*')
+			.where({ 'project_team.user_id': userId });
+	},
+
+	sectionsInProject(knex, userId) {
+		return knex('section_team')
+			.join('projects', 'section_team.project_id', '=', 'projects.id')
+			.join('section', 'section_team.section_id', '=', 'section.id')
+			.select('*')
+			.where({
+				'section_team.user_id': userId,
+			});
+	},
+
+	tasksInSection(knex, userId) {
+		return knex('task_team')
+			.join('section', 'task_team.section_id', '=', 'section.id')
+			.join('task', 'task_team.task_id', '=', 'task.id')
+			.select('*')
+			.where({
+				'task_team.user_id': userId,
+			});
+	},
+
+	findItems(knex, table, column, term) {
+		return knex.select('*').from(table).where(column, 'ilike', `%${term}%`);
+	},
 };
 
 module.exports = AppService;

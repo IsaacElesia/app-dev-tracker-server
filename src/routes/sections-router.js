@@ -26,7 +26,9 @@ sectionsRouter
 	//@access  private
 	.get(auth, (req, res, next) => {
 		const knexInstance = req.app.get('db');
-		AppService.getAllItems(knexInstance, 'section')
+		const { id } = req.user;
+
+		AppService.sectionsInProject(knexInstance, id)
 			.then((sections) => {
 				res.json(sections.map(serializeSection));
 			})

@@ -23,6 +23,7 @@ app.use('/api/project/team', require('./routes/project-team-router'));
 app.use('/api/sections', require('./routes/sections-router'));
 app.use('/api/section/team', require('./routes/section-team-router'));
 app.use('/api/tasks', require('./routes/task-router'));
+app.use('/api/task/team', require('./routes/task-team-router'));
 
 //Error Handler Middleware
 app.use(errorHandler);

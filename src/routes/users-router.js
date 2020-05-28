@@ -24,8 +24,9 @@ usersRouter
 	//@desc    Get all users Info
 	//@access  private
 	.get(auth, (req, res, next) => {
+		const userName = req.query.name;
 		const knexInstance = req.app.get('db');
-		AppService.getAllItems(knexInstance, 'users')
+		AppService.findItems(knexInstance, 'users', 'full_name', userName)
 			.then((users) => {
 				res.json(users.map(serializeUser));
 			})

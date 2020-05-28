@@ -9,6 +9,7 @@ const jsonParser = express.json();
 
 const serializeTask = (task) => ({
 	taskId: task.id,
+	createdBy: task.created_by,
 	startDate: xss(task.start_date),
 	dueDate: xss(task.due_date),
 	completed: xss(task.completed),
@@ -23,9 +24,11 @@ taskRouter
 	//@access  private
 	.get(auth, (req, res, next) => {
 		const knexInstance = req.app.get('db');
-		AppService.getAllItems(knexInstance, 'task')
-			.then((task) => {
-				res.json(task.map(serializeTask));
+		const { id } = req.user;
+
+		AppService.tasksInSection(knexInstance, id)
+			.then((tasks) => {
+				res.json(tasks.map(serializeTask));
 			})
 			.catch(next);
 	})
@@ -33,9 +36,17 @@ taskRouter
 	//@desc    Create new task
 	//@access  private
 	.post(auth, jsonParser, (req, res, next) => {
-		const { startDate, dueDate, completed, description, sectionId } = req.body;
+		const {
+			createdBy,
+			startDate,
+			dueDate,
+			completed,
+			description,
+			sectionId,
+		} = req.body;
 
 		const newTask = {
+			created_by: createdBy,
 			due_date: dueDate,
 			section_id: sectionId,
 			description,

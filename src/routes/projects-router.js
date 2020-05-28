@@ -13,7 +13,7 @@ const serializeProject = (project) => ({
 	dueDate: xss(project.due_date),
 	projectName: xss(project.project_name),
 	projectRepo: xss(project.project_repo),
-	completed: xss(project.completed),
+	completed: project.completed,
 	createdBy: xss(project.created_by),
 	description: xss(project.description),
 });
@@ -25,7 +25,9 @@ projectsRouter
 	//@access  private
 	.get(auth, (req, res, next) => {
 		const knexInstance = req.app.get('db');
-		AppService.getAllItems(knexInstance, 'projects')
+		const { id } = req.user;
+
+		AppService.projectsUserInvolveIn(knexInstance, id)
 			.then((projects) => {
 				res.json(projects.map(serializeProject));
 			})

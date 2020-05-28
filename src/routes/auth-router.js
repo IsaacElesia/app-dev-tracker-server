@@ -1,12 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const xss = require('xss');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRETE } = require('../config');
 const AppService = require('../AppService');
 const jsonParser = express.json();
 
 const auth = require('../middleware/auth');
+
+const serializeuser = (user) => ({
+	userId: user.id,
+	fullName: xss(user.full_name),
+	email: xss(user.email),
+	github: xss(user.github),
+	avatarUrl: xss(user.avatar_url),
+});
 
 //@route   GET api/auth
 //@desc    Get user Info
@@ -29,7 +38,6 @@ router.get('/', auth, async (req, res, next) => {
 // @desc     Authenticate handler & get token
 // @access   Public
 router.post('/', jsonParser, async (req, res) => {
-	console.log('body =', req.body);
 	const { email, password } = req.body;
 	const returnUser = { email, password };
 
@@ -66,7 +74,7 @@ router.post('/', jsonParser, async (req, res) => {
 
 		jwt.sign(payload, JWT_SECRETE, { expiresIn: 360000 }, (err, token) => {
 			if (err) throw err;
-			res.json({ token });
+			res.json({ user: serializeuser(user), token });
 		});
 	} catch (err) {
 		console.error(err.message);
