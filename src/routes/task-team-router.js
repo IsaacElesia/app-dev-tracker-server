@@ -10,7 +10,9 @@ const serializeTaskTeamMember = (taskTeam) => ({
 	taskTeamId: taskTeam.id,
 	taskId: taskTeam.task_id,
 	sectionId: taskTeam.section_id,
-	userId: taskTeam.user_id,
+	name: taskTeam.full_name,
+	email: taskTeam.email,
+	avatar: taskTeam.avatar_url,
 });
 
 taskTeamRouter
@@ -19,12 +21,19 @@ taskTeamRouter
 	//@desc    Get all task team members
 	//@access  private
 	.get(auth, (req, res, next) => {
+		const taskId = req.query.taskid;
 		const knexInstance = req.app.get('db');
-		AppService.getAllItems(knexInstance, 'task_team')
+		AppService.taskTeamMembers(knexInstance, taskId)
 			.then((taskTeam) => {
 				res.json(taskTeam.map(serializeTaskTeamMember));
 			})
 			.catch(next);
+
+		/* 	AppService.getAllItems(knexInstance, 'task_team')
+			.then((taskTeam) => {
+				res.json(taskTeam.map(serializeTaskTeamMember));
+			})
+			.catch(next); */
 	})
 	//@route   POST api/task/team
 	//@desc    Add a new task team member

@@ -56,6 +56,53 @@ const AppService = {
 			});
 	},
 
+	taskTeamMembers(knex, taskId) {
+		return knex('task_team')
+			.join('users', 'task_team.user_id', '=', 'users.id')
+			.select(
+				'task_team.id',
+				'task_team.task_id',
+				'task_team.section_id',
+				'users.full_name',
+				'users.email',
+				'users.avatar_url'
+			)
+			.where({
+				'task_team.task_id': taskId,
+			});
+	},
+
+	sectionTeamMembers(knex, sectionId) {
+		return knex('section_team')
+			.join('users', 'section_team.user_id', '=', 'users.id')
+			.select(
+				'section_team.id',
+				'section_team.section_id',
+				'section_team.project_id',
+				'users.full_name',
+				'users.email',
+				'users.avatar_url'
+			)
+			.where({
+				'section_team.section_id': sectionId,
+			});
+	},
+
+	projectTeamMembers(knex, projectId) {
+		return knex('project_team')
+			.join('users', 'project_team.user_id', '=', 'users.id')
+			.select(
+				'project_team.id',
+				'project_team.project_id',
+				'users.full_name',
+				'users.email',
+				'users.avatar_url'
+			)
+			.where({
+				'project_team.project_id': projectId,
+			});
+	},
+
 	findItems(knex, table, column, term) {
 		return knex.select('*').from(table).where(column, 'ilike', `%${term}%`);
 	},

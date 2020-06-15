@@ -12,7 +12,7 @@ const serializeTask = (task) => ({
 	createdBy: task.created_by,
 	startDate: xss(task.start_date),
 	dueDate: xss(task.due_date),
-	completed: xss(task.completed),
+	completed: task.completed,
 	description: xss(task.description),
 	sectionId: task.section_id,
 });
@@ -109,6 +109,7 @@ taskRouter
 	//@access  private
 	.patch(auth, jsonParser, (req, res, next) => {
 		const { startDate, dueDate, completed, description, sectionId } = req.body;
+		console.log('body =', req.body);
 
 		const taskToUpdate = {
 			start_date: startDate,
@@ -118,7 +119,8 @@ taskRouter
 			completed,
 		};
 
-		const numberOfValues = Object.values(taskToUpdate).filter(Boolean).length;
+		const numberOfValues = Object.values(taskToUpdate).filter((x) => x !== '')
+			.length;
 		if (numberOfValues === 0)
 			return res.status(400).json({
 				error: {

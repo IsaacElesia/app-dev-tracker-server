@@ -10,7 +10,9 @@ const serializeSectionTeamMember = (sectionTeam) => ({
 	sectionTeamId: sectionTeam.id,
 	projectId: sectionTeam.project_id,
 	sectionId: sectionTeam.section_id,
-	userId: sectionTeam.user_id,
+	name: sectionTeam.full_name,
+	email: sectionTeam.email,
+	avatar: sectionTeam.avatar_url,
 });
 
 sectionTeamRouter
@@ -19,10 +21,11 @@ sectionTeamRouter
 	//@desc    Get all sections team members
 	//@access  private
 	.get(auth, (req, res, next) => {
+		const sectionId = req.query.sectionid;
 		const knexInstance = req.app.get('db');
-		AppService.getAllItems(knexInstance, 'section_team')
-			.then((secTeam) => {
-				res.json(secTeam.map(serializeSectionTeamMember));
+		AppService.sectionTeamMembers(knexInstance, sectionId)
+			.then((sectionTeam) => {
+				res.json(sectionTeam.map(serializeSectionTeamMember));
 			})
 			.catch(next);
 	})

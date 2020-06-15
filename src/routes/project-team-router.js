@@ -9,7 +9,9 @@ const jsonParser = express.json();
 const serializeProjectTeamMember = (projectTeam) => ({
 	projectTeamId: projectTeam.id,
 	projectId: projectTeam.project_id,
-	userId: projectTeam.user_id,
+	name: projectTeam.full_name,
+	email: projectTeam.email,
+	avatar: projectTeam.avatar_url,
 });
 
 projectTeamRouter
@@ -18,10 +20,11 @@ projectTeamRouter
 	//@desc    Get all projects team members
 	//@access  private
 	.get(auth, (req, res, next) => {
+		const projectId = req.query.projectid;
 		const knexInstance = req.app.get('db');
-		AppService.getAllItems(knexInstance, 'project_team')
-			.then((proTeam) => {
-				res.json(proTeam.map(serializeProjectTeamMember));
+		AppService.projectTeamMembers(knexInstance, projectId)
+			.then((projectTeam) => {
+				res.json(projectTeam.map(serializeProjectTeamMember));
 			})
 			.catch(next);
 	})
