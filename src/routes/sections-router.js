@@ -138,7 +138,7 @@ sectionsRouter
 
 		const numberOfValues = Object.values(sectionToUpdate).filter(Boolean)
 			.length;
-		if (numberOfValues === 0)
+		if (numberOfValues === 0 && Object.keys(req.body).length !== 1)
 			return res.status(400).json({
 				error: {
 					message:
