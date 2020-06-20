@@ -1,26 +1,55 @@
-# Express Boilerplate!
+# App Dev Tracker
 
-This is a boilerplate project used for starting new projects!
+Live link client:[ https://app-dev-tracker-client.vercel.app/
+](https://app-dev-tracker-client.vercel.app/)
 
-## Set up
+Live link server: [https://hidden-beyond-18972.herokuapp.com/](https://hidden-beyond-18972.herokuapp.com/api)
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+Link to client repo:[ https://github.com/IsaacElesia/app-dev-tracker-client](https://github.com/IsaacElesia/app-dev-tracker-client)
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+Link to API repo: [https://github.com/IsaacElesia/app-dev-tracker-server](https://github.com/IsaacElesia/app-dev-tracker-server)
 
-## Scripts
+## Backend Endpoints
 
-Start the application `npm start`
+User login: /api/auth  
+Users: /api/users  
+Projects: /api/projects  
+Sections: /api/sections  
+Tasks: /api/tasks
 
-Start nodemon for the application `npm run dev`
+## App Description
 
-Run the tests `npm test`
+App Dev Tracker gives you the power to organize and plan your  
+project. It also gives you the ability to track your progress while developing an app.
 
-## Deploying
+### Dashboard
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+The dashboard shows you all the projects you are involved in and their status.  
+It also gives you the ability to filter your projects according to their  
+time status (late, past-due, on-time, and completed).
+
+### Project Details
+
+On the project detail page, you get to see the project description and  
+all the sections that make up the project. You can also see the status of each  
+section, that is whether it is late, past-due, on-time, or completed.
+
+### Section details
+
+The section detail page displays its description, picture, and all the task to  
+get done in other to complete that section of the project.
+
+### Task Details
+
+On the task detail page, a description of the task is shown, and you have  
+the ability to mark the task completed once it is done.
+
+## Technology Used
+
+HTML 5  
+CSS 3  
+JavaScript  
+React js  
+Node js  
+Express js  
+PostgreSQL
